@@ -1,12 +1,17 @@
 package eqt.PfBitrixConverter.api;
 
+import com.google.gson.Gson;
+import eqt.PfBitrixConverter.dto.pf.LeadsInfo;
+import eqt.PfBitrixConverter.dto.pf.PfToken;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 
-public class RestApiSender {
+public class RestApi {
 
-  public static String createPfToken() {
+  private static final Gson gson = new Gson();
+
+  public static PfToken createPfToken() {
     String tokenJson = "";
     String authHeader =
         "Basic WmdLVXouTEFGWmpzcDMxZjhTNFdJQUJnQklScGVZZWNhRFo3NmZYbjpjNTQwMzIxMWM0MTkxMjljYWExYjI2MTNkZjdhODQ0OQ==";
@@ -21,10 +26,10 @@ public class RestApiSender {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    return tokenJson;
+    return gson.fromJson(tokenJson, PfToken.class);
   }
 
-  public static String getPfLeads(String pfToken) {
+  public static LeadsInfo getPfLeads(String pfToken) {
     String leadsJson = "";
     try {
       HttpResponse<JsonNode> response =
@@ -36,6 +41,6 @@ public class RestApiSender {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    return leadsJson;
+    return gson.fromJson(leadsJson, LeadsInfo.class);
   }
 }
