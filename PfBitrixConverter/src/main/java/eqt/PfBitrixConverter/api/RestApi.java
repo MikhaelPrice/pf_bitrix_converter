@@ -33,7 +33,7 @@ public class RestApi {
     String leadsJson = "";
     try {
       HttpResponse<JsonNode> response =
-          Unirest.post("https://api-v2.mycrm.com/leads")
+          Unirest.get("https://api-v2.mycrm.com/leads")
               .header("Content-Type", "application/json")
               .header("Authorization", String.format("Bearer %s", pfToken))
               .asJson();
