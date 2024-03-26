@@ -1,24 +1,36 @@
 package eqt.PfBitrixConverter.service;
 
 import eqt.PfBitrixConverter.api.RestApi;
-import eqt.PfBitrixConverter.dto.leads.Lead;
-import eqt.PfBitrixConverter.dto.leads.LeadsInfo;
-import eqt.PfBitrixConverter.dto.leads.Preference;
+import eqt.PfBitrixConverter.dto.CallTrackingLeadsInfo;
+import eqt.PfBitrixConverter.dto.Lead;
+import eqt.PfBitrixConverter.dto.LeadsInfo;
+import eqt.PfBitrixConverter.dto.Preference;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class LeadService {
 
-  public static List<LeadsInfo> getPfLeadsFromAllPages(String pfToken) {
-    List<LeadsInfo> pfLeadsInfoPages = new ArrayList<>();
-    LeadsInfo pfLeadsInfo = RestApi.getPfLeads(pfToken, 1);
-    pfLeadsInfoPages.add(pfLeadsInfo);
-    double pagesMore = (double) pfLeadsInfo.getCount() / 100;
+  public static List<LeadsInfo> getLeadsFromAllPages(String pfToken) {
+    List<LeadsInfo> leadsInfoPages = new ArrayList<>();
+    LeadsInfo leadsInfo = RestApi.getPfLeads(pfToken, 1);
+    leadsInfoPages.add(leadsInfo);
+    double pagesMore = (double) leadsInfo.getCount() / 100;
     for (int pages = 2; pages <= pagesMore; pages++) {
-      pfLeadsInfoPages.add(RestApi.getPfLeads(pfToken, pages));
+      leadsInfoPages.add(RestApi.getPfLeads(pfToken, pages));
     }
-    return pfLeadsInfoPages;
+    return leadsInfoPages;
+  }
+
+  public static List<CallTrackingLeadsInfo> getCallTrackingLeadsFromAllPages(String pfToken) {
+    List<CallTrackingLeadsInfo> callTrackingLeadsInfoPages = new ArrayList<>();
+    CallTrackingLeadsInfo callTrackingLeadsInfo = RestApi.getCallTrackingPfLeads(pfToken, 1);
+    callTrackingLeadsInfoPages.add(callTrackingLeadsInfo);
+    double pagesMore = (double) callTrackingLeadsInfo.getCount() / 100;
+    for (int pages = 2; pages <= pagesMore; pages++) {
+      callTrackingLeadsInfoPages.add(RestApi.getCallTrackingPfLeads(pfToken, pages));
+    }
+    return callTrackingLeadsInfoPages;
   }
 
   public static String buildBitrixLeadComment(Lead lead) {
@@ -46,18 +58,19 @@ public class LeadService {
         + city
         + ", "
         + community
-        + ", "
+        + "\nProject Name: "
         + subCommunity
-        + ",\n "
+        + "\nType: "
         + offeringType
         + ", "
         + realEstateObject
-        + ", Price range "
-        + price
-        + " AED, Bedrooms "
+        + "\n Size: Bedrooms "
         + bedrooms
         + ", Bathrooms "
-        + bathrooms;
+        + bathrooms
+        + "\nPrice range: "
+        + price
+        + " AED";
   }
 
   private static String buildNumberRange(int num1, int num2) {

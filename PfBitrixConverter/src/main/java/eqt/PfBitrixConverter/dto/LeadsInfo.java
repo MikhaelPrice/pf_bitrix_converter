@@ -1,4 +1,4 @@
-package eqt.PfBitrixConverter.dto.leads;
+package eqt.PfBitrixConverter.dto;
 
 import lombok.Getter;
 

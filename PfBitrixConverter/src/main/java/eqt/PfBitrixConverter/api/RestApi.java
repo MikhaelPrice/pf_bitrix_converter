@@ -1,8 +1,10 @@
 package eqt.PfBitrixConverter.api;
 
 import com.google.gson.Gson;
+import eqt.PfBitrixConverter.dto.CallTrackingLeadsInfo;
+import eqt.PfBitrixConverter.dto.Lead;
 import eqt.PfBitrixConverter.dto.PfToken;
-import eqt.PfBitrixConverter.dto.leads.LeadsInfo;
+import eqt.PfBitrixConverter.dto.LeadsInfo;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
@@ -21,6 +23,7 @@ public class RestApi {
               .header("Content-Type", "application/json")
               .header("Authorization", authHeader)
               .body("{\"scope\": \"openid\", \"grant_type\": \"client_credentials\"}")
+              .connectTimeout(10000)
               .asJson();
       tokenJson = response.getBody().toPrettyString();
     } catch (Exception e) {
@@ -33,15 +36,48 @@ public class RestApi {
     String leadsJson = "";
     try {
       HttpResponse<JsonNode> response =
-              Unirest.get(String.format("https://api-v2.mycrm.com/leads?page=%s", page))
-                      .header("Content-Type", "application/json")
-                      .header("Authorization", String.format("Bearer %s", pfToken))
-                      .asJson();
+          Unirest.get(String.format("https://api-v2.mycrm.com/leads?page=%s", page))
+              .header("Content-Type", "application/json")
+              .header("Authorization", String.format("Bearer %s", pfToken))
+              .connectTimeout(10000)
+              .asJson();
       leadsJson = response.getBody().toPrettyString();
     } catch (Exception e) {
       e.printStackTrace();
     }
     return gson.fromJson(leadsJson, LeadsInfo.class);
+  }
+
+  public static Lead getPfLeadById(String pfToken, Long leadId) {
+    String leadJson = "";
+    try {
+      HttpResponse<JsonNode> response =
+          Unirest.get(String.format("https://api-v2.mycrm.com/leads/%s", leadId))
+              .header("Content-Type", "application/json")
+              .header("Authorization", String.format("Bearer %s", pfToken))
+              .connectTimeout(10000)
+              .asJson();
+      leadJson = response.getBody().toPrettyString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return gson.fromJson(leadJson, Lead.class);
+  }
+
+  public static CallTrackingLeadsInfo getCallTrackingPfLeads(String pfToken, int page) {
+    String callTrackingLeadsJson = "";
+    try {
+      HttpResponse<JsonNode> response =
+          Unirest.get(String.format("https://api-v2.mycrm.com/calltrackings?page=%s", page))
+              .header("Content-Type", "application/json")
+              .header("Authorization", String.format("Bearer %s", pfToken))
+              .connectTimeout(10000)
+              .asJson();
+      callTrackingLeadsJson = response.getBody().toPrettyString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return gson.fromJson(callTrackingLeadsJson, CallTrackingLeadsInfo.class);
   }
 
   public static boolean createBitrixLead(
@@ -56,6 +92,7 @@ public class RestApi {
               .queryString("fields[NAME]", firstName)
               .queryString("fields[COMMENTS]", comment)
               .header("Cookie", "qmb=0")
+              .connectTimeout(10000)
               .asJson();
       leadCreationResult = response.isSuccess();
     } catch (Exception e) {

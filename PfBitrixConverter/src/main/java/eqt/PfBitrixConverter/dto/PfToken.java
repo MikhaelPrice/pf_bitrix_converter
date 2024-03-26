@@ -8,5 +8,4 @@ public class PfToken {
 
   @SerializedName("access_token")
   private String token;
-
 }
