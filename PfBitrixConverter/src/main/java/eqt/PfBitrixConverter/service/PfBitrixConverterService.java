@@ -18,8 +18,7 @@ import static eqt.PfBitrixConverter.service.LeadService.*;
 public class PfBitrixConverterService {
 
   private static final String PROPERTY_FINDER_LEADS_TITLE = "Property Finder Lead";
-  private static final String PROPERTY_FINDER_CALL_TRACKING_LEADS_TITLE =
-      "Property Finder Call";
+  private static final String PROPERTY_FINDER_CALL_TRACKING_LEADS_TITLE = "Property Finder Call";
 
   @Autowired private LeadsRepository leadsRepository;
   @Autowired private CallTrackingLeadsRepository callTrackingLeadsRepository;
@@ -41,7 +40,12 @@ public class PfBitrixConverterService {
         if (!leadsRepository.existsById(leadId)) {
           boolean createdBitrixLead =
               createBitrixLead(
-                  leadFirstName, leadPhone, leadEmail, PROPERTY_FINDER_LEADS_TITLE, leadComment);
+                  leadFirstName,
+                  leadPhone,
+                  leadEmail,
+                  PROPERTY_FINDER_LEADS_TITLE,
+                  leadComment,
+                  chooseAssignee(leadsRepository.count() + callTrackingLeadsRepository.count()));
           Leads newLead =
               new Leads(
                   leadId, leadFirstName, leadEmail, leadPhone, leadComment, createdBitrixLead);
@@ -70,7 +74,8 @@ public class PfBitrixConverterService {
                   callTrackingPhone,
                   leadEmail,
                   PROPERTY_FINDER_CALL_TRACKING_LEADS_TITLE,
-                  "Call duration: " + callTrackingCallTime);
+                  "Call duration: " + callTrackingCallTime,
+                  chooseAssignee(leadsRepository.count() + callTrackingLeadsRepository.count()));
           CallTrackingLeads newCallTrackingLead =
               new CallTrackingLeads(
                   callTrackingId,

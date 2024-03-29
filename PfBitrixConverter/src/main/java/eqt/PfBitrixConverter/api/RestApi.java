@@ -81,7 +81,7 @@ public class RestApi {
   }
 
   public static boolean createBitrixLead(
-      String firstName, String phone, String email, String title, String comment) {
+      String firstName, String phone, String email, String title, String comment, int assigneeId) {
     boolean leadCreationResult;
     try {
       HttpResponse<JsonNode> response =
@@ -91,6 +91,7 @@ public class RestApi {
               .queryString("fields[TITLE]", title)
               .queryString("fields[NAME]", firstName)
               .queryString("fields[COMMENTS]", comment)
+              .queryString("fields[ASSIGNED_BY_ID]", assigneeId)
               .header("Cookie", "qmb=0")
               .connectTimeout(10000)
               .asJson();

@@ -76,4 +76,8 @@ public class LeadService {
   private static String buildNumberRange(int num1, int num2) {
     return num1 == num2 ? String.valueOf(num1) : num1 + "-" + num2;
   }
+
+  public static int chooseAssignee(long count){
+    return count % 2 == 0 ? 15 : 13;
+  }
 }
