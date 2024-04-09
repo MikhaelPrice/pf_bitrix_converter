@@ -12,4 +12,7 @@ public class CallTracking {
   private int callTime;
 
   private CallTrackingLead lead;
+
+  @SerializedName("user")
+  private PfAgent pfAgent;
 }

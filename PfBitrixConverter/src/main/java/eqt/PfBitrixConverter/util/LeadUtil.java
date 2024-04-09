@@ -1,4 +1,4 @@
-package eqt.PfBitrixConverter.service;
+package eqt.PfBitrixConverter.util;
 
 import eqt.PfBitrixConverter.api.RestApi;
 import eqt.PfBitrixConverter.dto.CallTrackingLeadsInfo;
@@ -9,7 +9,7 @@ import eqt.PfBitrixConverter.dto.Preference;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LeadService {
+public class LeadUtil {
 
   public static List<LeadsInfo> getLeadsFromAllPages(String pfToken) {
     List<LeadsInfo> leadsInfoPages = new ArrayList<>();
@@ -77,7 +77,19 @@ public class LeadService {
     return num1 == num2 ? String.valueOf(num1) : num1 + "-" + num2;
   }
 
-  public static int chooseAssignee(long count){
+  public static int chooseLeadAssignee(long count) {
     return count % 2 == 0 ? 15 : 13;
+  }
+
+  public static int chooseCallTrackingAssignee(long pfAgentId) {
+    if (pfAgentId == 185401) {
+      return 15;
+    } else if (pfAgentId == 102033 || pfAgentId == 102034) {
+      return 27;
+    } else if (pfAgentId == 165786) {
+      return 13;
+    } else {
+      return 27;
+    }
   }
 }

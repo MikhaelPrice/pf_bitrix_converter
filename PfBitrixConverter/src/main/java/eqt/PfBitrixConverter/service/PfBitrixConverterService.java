@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static eqt.PfBitrixConverter.api.RestApi.*;
-import static eqt.PfBitrixConverter.service.LeadService.*;
+import static eqt.PfBitrixConverter.util.LeadUtil.*;
 
 @Service
 public class PfBitrixConverterService {
@@ -45,7 +45,7 @@ public class PfBitrixConverterService {
                   leadEmail,
                   PROPERTY_FINDER_LEADS_TITLE,
                   leadComment,
-                  chooseAssignee(leadsRepository.count() + callTrackingLeadsRepository.count()));
+                  chooseLeadAssignee(leadsRepository.count() + callTrackingLeadsRepository.count()));
           Leads newLead =
               new Leads(
                   leadId, leadFirstName, leadEmail, leadPhone, leadComment, createdBitrixLead);
@@ -55,7 +55,8 @@ public class PfBitrixConverterService {
     }
     for (CallTrackingLeadsInfo callTrackingLeadsInfo : callTrackingLeadsFromAllPages) {
       for (CallTracking callTracking : callTrackingLeadsInfo.getCallTrackingLeads()) {
-        Long callTrackingId = callTracking.getId();
+        Long callTrackingId = 5L;
+        Long pfAgentId = callTracking.getPfAgent().getId();
         String leadFirstName = "";
         String leadEmail = "";
         String callTrackingPhone = callTracking.getPhone();
@@ -73,9 +74,9 @@ public class PfBitrixConverterService {
                   leadFirstName,
                   callTrackingPhone,
                   leadEmail,
-                  PROPERTY_FINDER_CALL_TRACKING_LEADS_TITLE,
+                  PROPERTY_FINDER_CALL_TRACKING_LEADS_TITLE + " Test (не обрабатывать)",
                   "Call duration: " + callTrackingCallTime,
-                  chooseAssignee(leadsRepository.count() + callTrackingLeadsRepository.count()));
+                  chooseCallTrackingAssignee(pfAgentId));
           CallTrackingLeads newCallTrackingLead =
               new CallTrackingLeads(
                   callTrackingId,
