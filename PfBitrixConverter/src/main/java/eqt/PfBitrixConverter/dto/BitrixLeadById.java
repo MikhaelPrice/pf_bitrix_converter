@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 
 @Getter
-public class BitrixLeads {
+public class BitrixLeadById {
 
   @SerializedName("ID")
   private Long id;

@@ -1,6 +1,7 @@
 package eqt.PfBitrixConverter.service;
 
 import eqt.PfBitrixConverter.dto.*;
+import eqt.PfBitrixConverter.entity.BitrixLeads;
 import eqt.PfBitrixConverter.entity.CallTrackingLeads;
 import eqt.PfBitrixConverter.entity.Leads;
 import eqt.PfBitrixConverter.repository.BitrixLeadsRepository;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,11 +29,7 @@ public class PfBitrixConverterService {
 
   @Scheduled(fixedRate = 300000)
   public void sendNewLeadsFromPfExpertToBitrix() {
-    List<BitrixLeads> bitrixLeads = getBitrixLeads().getBitrixLeads();
-    List<Long> bitrixLeadsIds = new ArrayList<>();
-    for (BitrixLeads bitrixLead : bitrixLeads) {
-      bitrixLeadsIds.add(bitrixLead.getId());
-    }
+    List<Long> bitrixLeadsIds = extractLeadIds(getBitrixLeads().getBitrixLeadsByIds());
     String pfToken = createPfToken().getToken();
     List<LeadsInfo> pfLeadsInfoPages = getLeadsFromAllPages(pfToken);
     List<CallTrackingLeadsInfo> callTrackingLeadsFromAllPages =
@@ -123,8 +119,8 @@ public class PfBitrixConverterService {
                     bitrixLeadName, phone, null, bitrixLeadTitle, bitrixLeadComment, assigneeId)
                 .getCreatedLeadId();
         boolean createBitrixLead = Objects.nonNull(createdLeadId);
-        eqt.PfBitrixConverter.entity.BitrixLeads newBitrixLead =
-            new eqt.PfBitrixConverter.entity.BitrixLeads(
+        BitrixLeads newBitrixLead =
+            new BitrixLeads(
                 createdLeadId,
                 bitrixLeadTitle,
                 phone,

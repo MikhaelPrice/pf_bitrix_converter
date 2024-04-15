@@ -1,13 +1,11 @@
 package eqt.PfBitrixConverter.util;
 
 import eqt.PfBitrixConverter.api.RestApi;
-import eqt.PfBitrixConverter.dto.CallTrackingLeadsInfo;
-import eqt.PfBitrixConverter.dto.Lead;
-import eqt.PfBitrixConverter.dto.LeadsInfo;
-import eqt.PfBitrixConverter.dto.Preference;
+import eqt.PfBitrixConverter.dto.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LeadUtil {
 
@@ -31,6 +29,12 @@ public class LeadUtil {
       callTrackingLeadsInfoPages.add(RestApi.getCallTrackingPfLeads(pfToken, pages));
     }
     return callTrackingLeadsInfoPages;
+  }
+
+  public static List<Long> extractLeadIds(List<BitrixLeadById> bitrixLeads){
+    return bitrixLeads.stream()
+            .map(BitrixLeadById::getId)
+            .collect(Collectors.toList());
   }
 
   public static String buildBitrixLeadComment(Lead lead) {
