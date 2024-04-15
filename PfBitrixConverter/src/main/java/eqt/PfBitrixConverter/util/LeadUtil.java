@@ -81,7 +81,7 @@ public class LeadUtil {
     return count % 2 == 0 ? 15 : 13;
   }
 
-  public static int chooseCallTrackingAssignee(long pfAgentId) {
+  public static int chooseCallTrackingLeadAssignee(long pfAgentId) {
     if (pfAgentId == 185401) {
       return 15;
     } else if (pfAgentId == 102033 || pfAgentId == 102034) {

@@ -1,10 +1,7 @@
 package eqt.PfBitrixConverter.api;
 
 import com.google.gson.Gson;
-import eqt.PfBitrixConverter.dto.CallTrackingLeadsInfo;
-import eqt.PfBitrixConverter.dto.Lead;
-import eqt.PfBitrixConverter.dto.PfToken;
-import eqt.PfBitrixConverter.dto.LeadsInfo;
+import eqt.PfBitrixConverter.dto.*;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
@@ -80,9 +77,9 @@ public class RestApi {
     return gson.fromJson(callTrackingLeadsJson, CallTrackingLeadsInfo.class);
   }
 
-  public static boolean createBitrixLead(
+  public static CreatedBitrixLead createBitrixLead(
       String firstName, String phone, String email, String title, String comment, int assigneeId) {
-    boolean leadCreationResult;
+    String createdBitrixLeadJson = "";
     try {
       HttpResponse<JsonNode> response =
           Unirest.post("https://eqt.bitrix24.by/rest/53/t2kn6fktlq973hco/crm.lead.add.json")
@@ -95,10 +92,60 @@ public class RestApi {
               .header("Cookie", "qmb=0")
               .connectTimeout(10000)
               .asJson();
-      leadCreationResult = response.isSuccess();
+      createdBitrixLeadJson = response.getBody().toPrettyString();
     } catch (Exception e) {
-      leadCreationResult = false;
+      e.printStackTrace();
     }
-    return leadCreationResult;
+    return gson.fromJson(createdBitrixLeadJson, CreatedBitrixLead.class);
+  }
+
+  public static boolean deleteBitrixLead(Long bitrixLeadId) {
+    boolean leadUpdatingResult;
+    try {
+      HttpResponse<JsonNode> response =
+          Unirest.post("https://eqt.bitrix24.by/rest/53/t2kn6fktlq973hco/crm.lead.delete.json")
+              .header("Cookie", "qmb=0")
+              .header("Content-Type", "application/x-www-form-urlencoded")
+              .field("ID", bitrixLeadId)
+              .connectTimeout(10000)
+              .asJson();
+      leadUpdatingResult = response.isSuccess();
+    } catch (Exception e) {
+      leadUpdatingResult = false;
+    }
+    return leadUpdatingResult;
+  }
+
+  public static BitrixLeadsInfo getBitrixLeads() {
+    String bitrixLeadsJson = "";
+    try {
+      HttpResponse<JsonNode> response =
+          Unirest.get("https://eqt.bitrix24.by/rest/53/t2kn6fktlq973hco/crm.lead.list.json")
+              .header("Cookie", "qmb=0")
+              .connectTimeout(10000)
+              .asJson();
+      bitrixLeadsJson = response.getBody().toPrettyString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return gson.fromJson(bitrixLeadsJson, BitrixLeadsInfo.class);
+  }
+
+  public static GetBitrixLeadInfo getBitrixLead(Long bitrixLeadId) {
+    String getBitrixLeadInfo = "";
+    try {
+      HttpResponse<JsonNode> response =
+          Unirest.post("https://eqt.bitrix24.by/rest/53/t2kn6fktlq973hco/crm.lead.get.json")
+              .header("Cookie", "qmb=0")
+              .header("Content-Type", "application/x-www-form-urlencoded")
+              .field("ID", bitrixLeadId)
+              .connectTimeout(10000)
+              .asJson();
+      getBitrixLeadInfo = response.getBody().toPrettyString();
+      System.out.println(getBitrixLeadInfo);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return gson.fromJson(getBitrixLeadInfo, GetBitrixLeadInfo.class);
   }
 }
