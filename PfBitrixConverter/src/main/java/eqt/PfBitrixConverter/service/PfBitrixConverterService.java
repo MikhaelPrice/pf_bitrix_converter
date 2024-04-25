@@ -50,8 +50,7 @@ public class PfBitrixConverterService {
                   leadEmail,
                   PROPERTY_FINDER_LEADS_TITLE,
                   leadComment,
-                  chooseLeadAssignee(
-                      leadsRepository.count() + callTrackingLeadsRepository.count()));
+                  choosePfLeadAssignee(lead.getPfAgent().getId(), leadsRepository.count()));
           Leads newLead =
               new Leads(
                   leadId,

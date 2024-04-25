@@ -10,6 +10,9 @@ public class Lead {
 
   private Long id;
 
+  @SerializedName("user")
+  private PfAgent pfAgent;
+
   @SerializedName("first_name")
   private String firstName;
 

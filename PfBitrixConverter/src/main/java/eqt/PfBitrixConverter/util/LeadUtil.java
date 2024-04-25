@@ -31,10 +31,8 @@ public class LeadUtil {
     return callTrackingLeadsInfoPages;
   }
 
-  public static List<Long> extractLeadIds(List<BitrixLeadById> bitrixLeads){
-    return bitrixLeads.stream()
-            .map(BitrixLeadById::getId)
-            .collect(Collectors.toList());
+  public static List<Long> extractLeadIds(List<BitrixLeadById> bitrixLeads) {
+    return bitrixLeads.stream().map(BitrixLeadById::getId).collect(Collectors.toList());
   }
 
   public static String buildBitrixLeadComment(Lead lead) {
@@ -79,6 +77,15 @@ public class LeadUtil {
 
   private static String buildNumberRange(int num1, int num2) {
     return num1 == num2 ? String.valueOf(num1) : num1 + "-" + num2;
+  }
+
+  public static int choosePfLeadAssignee(long pfAgentId, long count) {
+    if (pfAgentId == 165786) {
+      return 13;
+    } else if (pfAgentId == 185401) {
+      return 15;
+    }
+    return count % 2 == 0 ? 15 : 13;
   }
 
   public static int chooseLeadAssignee(long count) {
