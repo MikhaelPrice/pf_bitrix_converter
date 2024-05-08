@@ -9,6 +9,17 @@ import java.util.stream.Collectors;
 
 public class LeadUtil {
 
+  private static final int BABENKO_BITRIX_ID = 15;
+  private static final int BABENKO_PF_ID = 185401;
+
+  private static final int DIACHKOVA_BITRIX_ID = 13;
+  private static final int DIACHKOVA_PF_ID = 165786;
+
+  private static final int VLAD_BITRIX_ID = 27;
+  private static final int VLAD_PF_ID = 102034;
+
+  private static final int EQT_PF_ID = 102033;
+
   public static List<LeadsInfo> getLeadsFromAllPages(String pfToken) {
     List<LeadsInfo> leadsInfoPages = new ArrayList<>();
     LeadsInfo leadsInfo = RestApi.getPfLeads(pfToken, 1);
@@ -80,27 +91,27 @@ public class LeadUtil {
   }
 
   public static int choosePfLeadAssignee(long pfAgentId, long count) {
-    if (pfAgentId == 165786) {
-      return 13;
-    } else if (pfAgentId == 185401) {
-      return 15;
+    if (pfAgentId == DIACHKOVA_PF_ID) {
+      return DIACHKOVA_BITRIX_ID;
+    } else if (pfAgentId == BABENKO_PF_ID || pfAgentId == VLAD_PF_ID) {
+      return BABENKO_BITRIX_ID;
     }
-    return count % 2 == 0 ? 15 : 13;
+    return chooseOtherLeadAssignee(count);
   }
 
-  public static int chooseLeadAssignee(long count) {
-    return count % 2 == 0 ? 15 : 13;
+  public static int chooseOtherLeadAssignee(long count) {
+    return count % 2 == 0 ? BABENKO_BITRIX_ID : DIACHKOVA_BITRIX_ID;
   }
 
   public static int chooseCallTrackingLeadAssignee(long pfAgentId) {
-    if (pfAgentId == 185401) {
-      return 15;
-    } else if (pfAgentId == 102033 || pfAgentId == 102034) {
-      return 27;
-    } else if (pfAgentId == 165786) {
-      return 13;
+    if (pfAgentId == BABENKO_PF_ID) {
+      return BABENKO_BITRIX_ID;
+    } else if (pfAgentId == EQT_PF_ID || pfAgentId == VLAD_PF_ID) {
+      return VLAD_BITRIX_ID;
+    } else if (pfAgentId == DIACHKOVA_PF_ID) {
+      return DIACHKOVA_BITRIX_ID;
     } else {
-      return 27;
+      return VLAD_BITRIX_ID;
     }
   }
 }

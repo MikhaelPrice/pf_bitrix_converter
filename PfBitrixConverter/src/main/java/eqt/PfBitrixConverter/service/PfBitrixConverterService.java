@@ -112,7 +112,7 @@ public class PfBitrixConverterService {
       boolean isCustomLead = Objects.nonNull(bitrixLeadSource);
       if (!bitrixLeadsRepository.existsById(bitrixLeadId) && !isPfLead && !isCustomLead) {
         boolean deletedBitrixLead = deleteBitrixLead(bitrixLeadId);
-        int assigneeId = chooseLeadAssignee(bitrixLeadsRepository.count());
+        int assigneeId = chooseOtherLeadAssignee(bitrixLeadsRepository.count());
         Long createdLeadId =
             createBitrixLead(
                     bitrixLeadName, phone, null, bitrixLeadTitle, bitrixLeadComment, assigneeId)
