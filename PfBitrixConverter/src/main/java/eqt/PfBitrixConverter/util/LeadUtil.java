@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static eqt.PfBitrixConverter.api.RestApi.getBitrixLeads;
+
 public class LeadUtil {
 
   public static final int BABENKO_BITRIX_ID = 15;
@@ -46,8 +48,18 @@ public class LeadUtil {
     return callTrackingLeadsInfoPages;
   }
 
-  public static List<Long> extractLeadIds(List<BitrixLeadById> bitrixLeads) {
+  private static List<Long> extractLeadIds(List<BitrixLeadById> bitrixLeads) {
     return bitrixLeads.stream().map(BitrixLeadById::getId).collect(Collectors.toList());
+  }
+
+  public static List<Long> getBitrixLeadsIdsFromAllPages(){
+    List<Long> totalBitrixLeadsIds = new ArrayList<>();
+    int totalBitrixLeads = getBitrixLeads(0).getTotalBitrixLeads();
+    for (int bitrixLead = 0; bitrixLead <= totalBitrixLeads; bitrixLead += 50) {
+      List<BitrixLeadById> bitrixLeadsByIds = getBitrixLeads(bitrixLead).getBitrixLeadsByIds();
+      totalBitrixLeadsIds.addAll(extractLeadIds(bitrixLeadsByIds));
+    }
+    return totalBitrixLeadsIds;
   }
 
   public static String buildBitrixLeadComment(Lead lead) {

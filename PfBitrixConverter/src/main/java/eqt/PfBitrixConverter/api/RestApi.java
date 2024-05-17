@@ -120,13 +120,13 @@ public class RestApi {
     boolean leadUpdatingResult;
     try {
       HttpResponse<JsonNode> response =
-              Unirest.post("https://eqt.bitrix24.by/rest/53/t2kn6fktlq973hco/crm.lead.update.json")
-                      .header("Cookie", "qmb=0")
-                      .header("Content-Type", "application/x-www-form-urlencoded")
-                      .field("ID", bitrixLeadId)
-                      .field("fields[ASSIGNED_BY_ID]", String.valueOf(assigneeLeadId))
-                      .connectTimeout(10000)
-                      .asJson();
+          Unirest.post("https://eqt.bitrix24.by/rest/53/t2kn6fktlq973hco/crm.lead.update.json")
+              .header("Cookie", "qmb=0")
+              .header("Content-Type", "application/x-www-form-urlencoded")
+              .field("ID", bitrixLeadId)
+              .field("fields[ASSIGNED_BY_ID]", String.valueOf(assigneeLeadId))
+              .connectTimeout(10000)
+              .asJson();
       leadUpdatingResult = response.isSuccess();
     } catch (Exception e) {
       leadUpdatingResult = false;
@@ -134,12 +134,17 @@ public class RestApi {
     return leadUpdatingResult;
   }
 
-  public static BitrixLeadsInfo getBitrixLeads() {
+  public static BitrixLeadsInfo getBitrixLeads(int startFromLead) {
     String bitrixLeadsJson = "";
     try {
       HttpResponse<JsonNode> response =
-          Unirest.get("https://eqt.bitrix24.by/rest/53/t2kn6fktlq973hco/crm.lead.list.json")
+          Unirest.get(
+                  String.format(
+                      "https://eqt.bitrix24.by/rest/53/t2kn6fktlq973hco/crm.lead.list.json?start=%s",
+                      startFromLead))
               .header("Cookie", "qmb=0")
+              .header("Content-Type", "application/json")
+              .header("start", String.valueOf(startFromLead))
               .connectTimeout(10000)
               .asJson();
       bitrixLeadsJson = response.getBody().toPrettyString();
@@ -160,7 +165,6 @@ public class RestApi {
               .connectTimeout(10000)
               .asJson();
       getBitrixLeadInfo = response.getBody().toPrettyString();
-      System.out.println(getBitrixLeadInfo);
     } catch (Exception e) {
       e.printStackTrace();
     }

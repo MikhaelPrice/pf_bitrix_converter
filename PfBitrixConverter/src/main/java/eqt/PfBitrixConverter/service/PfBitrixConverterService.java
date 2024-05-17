@@ -29,7 +29,7 @@ public class PfBitrixConverterService {
 
   @Scheduled(fixedRate = 300000)
   public void sendNewLeadsFromPfExpertToBitrix() {
-    List<Long> bitrixLeadsIds = extractLeadIds(getBitrixLeads().getBitrixLeadsByIds());
+    List<Long> totalBitrixLeadsIds = getBitrixLeadsIdsFromAllPages();
     String pfToken = createPfToken().getToken();
     List<LeadsInfo> pfLeadsInfoPages = getLeadsFromAllPages(pfToken);
     List<CallTrackingLeadsInfo> callTrackingLeadsFromAllPages =
@@ -99,17 +99,24 @@ public class PfBitrixConverterService {
         }
       }
     }
-    for (Long bitrixLeadId : bitrixLeadsIds) {
+    for (Long bitrixLeadId : totalBitrixLeadsIds) {
       GetBitrixLead bitrixLead = getBitrixLead(bitrixLeadId).getBitrixLead();
       String bitrixLeadName = bitrixLead.getName();
       String bitrixLeadTitle = bitrixLead.getTitle();
       String bitrixLeadComment = bitrixLead.getComment();
-      String phone = bitrixLead.getBitrixLeadPhoneInfo().get(0).getPhone();
+      List<BitrixLeadPhone> bitrixLeadPhoneInfo = bitrixLead.getBitrixLeadPhoneInfo();
+      String phone = "";
+      if (Objects.nonNull(bitrixLeadPhoneInfo)) {
+        phone = bitrixLeadPhoneInfo.get(0).getPhone();
+      }
       int bitrixLeadAssignee = bitrixLead.getAssignee();
       boolean isPfLead =
           bitrixLeadTitle.equals(PROPERTY_FINDER_CALL_TRACKING_LEADS_TITLE)
               || bitrixLeadTitle.equals(PROPERTY_FINDER_LEADS_TITLE);
-      if (!bitrixLeadsRepository.existsById(bitrixLeadId) && !isPfLead && bitrixLeadAssignee == 1) {
+      if (!bitrixLeadsRepository.existsById(bitrixLeadId)
+          && !isPfLead
+          && bitrixLeadAssignee == ALEX_BITRIX_ID) {
+        System.out.println(bitrixLeadId);
         boolean updatedBitrixLead = updateBitrixLead(bitrixLeadId, BABENKO_BITRIX_ID);
         BitrixLeads newBitrixLead =
             new BitrixLeads(

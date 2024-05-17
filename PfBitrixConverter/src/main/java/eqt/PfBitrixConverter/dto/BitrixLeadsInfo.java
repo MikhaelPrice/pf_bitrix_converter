@@ -10,4 +10,10 @@ public class BitrixLeadsInfo {
 
   @SerializedName("result")
   private List<BitrixLeadById> bitrixLeadsByIds;
+
+  @SerializedName("total")
+  private int totalBitrixLeads;
+
+  @SerializedName("next")
+  private int nextBitrixLeads;
 }
