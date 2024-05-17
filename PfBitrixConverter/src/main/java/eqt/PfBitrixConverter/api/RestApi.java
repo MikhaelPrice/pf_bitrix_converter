@@ -116,6 +116,24 @@ public class RestApi {
     return leadUpdatingResult;
   }
 
+  public static boolean updateBitrixLead(Long bitrixLeadId, int assigneeLeadId) {
+    boolean leadUpdatingResult;
+    try {
+      HttpResponse<JsonNode> response =
+              Unirest.post("https://eqt.bitrix24.by/rest/53/t2kn6fktlq973hco/crm.lead.update.json")
+                      .header("Cookie", "qmb=0")
+                      .header("Content-Type", "application/x-www-form-urlencoded")
+                      .field("ID", bitrixLeadId)
+                      .field("fields[ASSIGNED_BY_ID]", String.valueOf(assigneeLeadId))
+                      .connectTimeout(10000)
+                      .asJson();
+      leadUpdatingResult = response.isSuccess();
+    } catch (Exception e) {
+      leadUpdatingResult = false;
+    }
+    return leadUpdatingResult;
+  }
+
   public static BitrixLeadsInfo getBitrixLeads() {
     String bitrixLeadsJson = "";
     try {

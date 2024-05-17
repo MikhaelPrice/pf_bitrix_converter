@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>eqt</groupId>
 	<artifactId>PfBitrixConverter</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5</version>
 	<name>PfBitrixConverter</name>
 	<description>Converter of leads from PF to Bitrix</description>
 	<properties>

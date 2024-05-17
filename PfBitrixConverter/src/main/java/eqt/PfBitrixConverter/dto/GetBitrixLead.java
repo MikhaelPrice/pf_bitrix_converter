@@ -25,4 +25,7 @@ public class GetBitrixLead {
 
   @SerializedName("COMMENTS")
   private String comment;
+
+  @SerializedName("ASSIGNED_BY_ID")
+  private int assignee;
 }

@@ -28,10 +28,7 @@ public class BitrixLeads {
   @Column(name = "comment")
   private String comment;
 
-  @Column(name = "deletedOnBitrix")
-  private boolean deletedOnBitrix;
-
-  @Column(name = "createdOnBitrix")
+  @Column(name = "updatedOnBitrix")
   private boolean createdOnBitrix;
 
   @Column(name = "responsible")

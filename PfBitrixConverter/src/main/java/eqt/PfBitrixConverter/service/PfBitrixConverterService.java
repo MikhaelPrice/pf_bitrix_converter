@@ -103,31 +103,23 @@ public class PfBitrixConverterService {
       GetBitrixLead bitrixLead = getBitrixLead(bitrixLeadId).getBitrixLead();
       String bitrixLeadName = bitrixLead.getName();
       String bitrixLeadTitle = bitrixLead.getTitle();
-      Object bitrixLeadSource = bitrixLead.getSource();
       String bitrixLeadComment = bitrixLead.getComment();
       String phone = bitrixLead.getBitrixLeadPhoneInfo().get(0).getPhone();
+      int bitrixLeadAssignee = bitrixLead.getAssignee();
       boolean isPfLead =
           bitrixLeadTitle.equals(PROPERTY_FINDER_CALL_TRACKING_LEADS_TITLE)
               || bitrixLeadTitle.equals(PROPERTY_FINDER_LEADS_TITLE);
-      boolean isCustomLead = Objects.nonNull(bitrixLeadSource);
-      if (!bitrixLeadsRepository.existsById(bitrixLeadId) && !isPfLead && !isCustomLead) {
-        boolean deletedBitrixLead = deleteBitrixLead(bitrixLeadId);
-        int assigneeId = chooseOtherLeadAssignee(bitrixLeadsRepository.count());
-        Long createdLeadId =
-            createBitrixLead(
-                    bitrixLeadName, phone, null, bitrixLeadTitle, bitrixLeadComment, assigneeId)
-                .getCreatedLeadId();
-        boolean createBitrixLead = Objects.nonNull(createdLeadId);
+      if (!bitrixLeadsRepository.existsById(bitrixLeadId) && !isPfLead && bitrixLeadAssignee == 1) {
+        boolean updatedBitrixLead = updateBitrixLead(bitrixLeadId, BABENKO_BITRIX_ID);
         BitrixLeads newBitrixLead =
             new BitrixLeads(
-                createdLeadId,
+                bitrixLeadId,
                 bitrixLeadTitle,
                 phone,
                 bitrixLeadName,
                 bitrixLeadComment,
-                deletedBitrixLead,
-                createBitrixLead,
-                assigneeId);
+                updatedBitrixLead,
+                BABENKO_BITRIX_ID);
         bitrixLeadsRepository.save(newBitrixLead);
       }
     }

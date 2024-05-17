@@ -9,16 +9,20 @@ import java.util.stream.Collectors;
 
 public class LeadUtil {
 
-  private static final int BABENKO_BITRIX_ID = 15;
-  private static final int BABENKO_PF_ID = 185401;
+  public static final int BABENKO_BITRIX_ID = 15;
+  public static final int BABENKO_PF_ID = 185401;
 
-  private static final int DIACHKOVA_BITRIX_ID = 13;
-  private static final int DIACHKOVA_PF_ID = 165786;
+  public static final int DIACHKOVA_BITRIX_ID = 13;
+  public static final int DIACHKOVA_PF_ID = 165786;
 
-  private static final int VLAD_BITRIX_ID = 27;
-  private static final int VLAD_PF_ID = 102034;
+  public static final int VLAD_BITRIX_ID = 27;
+  public static final int VLAD_PF_ID = 102034;
 
-  private static final int EQT_PF_ID = 102033;
+  public static final int MIKE_BITRIX_ID = 53;
+
+  public static final int ALEX_BITRIX_ID = 1;
+
+  public static final int EQT_PF_ID = 102033;
 
   public static List<LeadsInfo> getLeadsFromAllPages(String pfToken) {
     List<LeadsInfo> leadsInfoPages = new ArrayList<>();
@@ -96,10 +100,10 @@ public class LeadUtil {
     } else if (pfAgentId == BABENKO_PF_ID || pfAgentId == VLAD_PF_ID) {
       return BABENKO_BITRIX_ID;
     }
-    return chooseOtherLeadAssignee(count);
+    return chooseBitrixLeadAssignee(count);
   }
 
-  public static int chooseOtherLeadAssignee(long count) {
+  public static int chooseBitrixLeadAssignee(long count) {
     return count % 2 == 0 ? BABENKO_BITRIX_ID : DIACHKOVA_BITRIX_ID;
   }
 
