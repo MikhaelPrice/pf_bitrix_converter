@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static eqt.PfBitrixConverter.api.RestApi.getBitrixLeads;
-
 public class LeadUtil {
 
   public static final int BABENKO_BITRIX_ID = 15;
@@ -26,7 +24,13 @@ public class LeadUtil {
 
   public static final int EQT_PF_ID = 102033;
 
-  public static List<LeadsInfo> getLeadsFromAllPages(String pfToken) {
+  private final RestApi restApi;
+
+  public LeadUtil(RestApi restApi) {
+    this.restApi = restApi;
+  }
+
+  public List<LeadsInfo> getLeadsFromAllPages(String pfToken) {
     List<LeadsInfo> leadsInfoPages = new ArrayList<>();
     LeadsInfo leadsInfo = RestApi.getPfLeads(pfToken, 1);
     leadsInfoPages.add(leadsInfo);
@@ -37,13 +41,13 @@ public class LeadUtil {
     return leadsInfoPages;
   }
 
-  public static List<CallTrackingLeadsInfo> getCallTrackingLeadsFromAllPages(String pfToken) {
+  public List<CallTrackingLeadsInfo> getCallTrackingLeadsFromAllPages(String pfToken) {
     List<CallTrackingLeadsInfo> callTrackingLeadsInfoPages = new ArrayList<>();
-    CallTrackingLeadsInfo callTrackingLeadsInfo = RestApi.getCallTrackingPfLeads(pfToken, 1);
+    CallTrackingLeadsInfo callTrackingLeadsInfo = restApi.getCallTrackingPfLeads(pfToken, 1);
     callTrackingLeadsInfoPages.add(callTrackingLeadsInfo);
     double pagesMore = (double) callTrackingLeadsInfo.getCount() / 100;
     for (int pages = 2; pages <= pagesMore; pages++) {
-      callTrackingLeadsInfoPages.add(RestApi.getCallTrackingPfLeads(pfToken, pages));
+      callTrackingLeadsInfoPages.add(restApi.getCallTrackingPfLeads(pfToken, pages));
     }
     return callTrackingLeadsInfoPages;
   }
@@ -52,11 +56,11 @@ public class LeadUtil {
     return bitrixLeads.stream().map(BitrixLeadById::getId).collect(Collectors.toList());
   }
 
-  public static List<Long> getBitrixLeadsIdsFromAllPages(){
+  public List<Long> getBitrixLeadsIdsFromAllPages(){
     List<Long> totalBitrixLeadsIds = new ArrayList<>();
-    int totalBitrixLeads = getBitrixLeads(0).getTotalBitrixLeads();
+    int totalBitrixLeads = restApi.getBitrixLeads(0).getTotalBitrixLeads();
     for (int bitrixLead = 0; bitrixLead <= totalBitrixLeads; bitrixLead += 50) {
-      List<BitrixLeadById> bitrixLeadsByIds = getBitrixLeads(bitrixLead).getBitrixLeadsByIds();
+      List<BitrixLeadById> bitrixLeadsByIds = restApi.getBitrixLeads(bitrixLead).getBitrixLeadsByIds();
       totalBitrixLeadsIds.addAll(extractLeadIds(bitrixLeadsByIds));
     }
     return totalBitrixLeadsIds;
