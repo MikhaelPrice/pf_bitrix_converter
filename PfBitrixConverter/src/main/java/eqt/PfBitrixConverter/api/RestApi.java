@@ -2,9 +2,7 @@ package eqt.PfBitrixConverter.api;
 
 import com.google.gson.Gson;
 import eqt.PfBitrixConverter.dto.*;
-import eqt.PfBitrixConverter.entity.LeadsErrors;
 import eqt.PfBitrixConverter.repository.LeadsErrorsRepository;
-import eqt.PfBitrixConverter.util.TimeUtil;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
@@ -51,7 +49,7 @@ public class RestApi {
     return gson.fromJson(leadsJson, LeadsInfo.class);
   }
 
-  public Lead getPfLeadById(String pfToken, Long leadId) {
+  public static Lead getPfLeadById(String pfToken, Long leadId) {
     String leadJson = "";
     try {
       HttpResponse<JsonNode> response =
@@ -62,13 +60,12 @@ public class RestApi {
               .asJson();
       leadJson = response.getBody().toPrettyString();
     } catch (Exception e) {
-      leadsErrorsRepository.save(
-          new LeadsErrors((long) e.hashCode(), e.toString(), TimeUtil.currentTime()));
+      e.printStackTrace();
     }
     return gson.fromJson(leadJson, Lead.class);
   }
 
-  public CallTrackingLeadsInfo getCallTrackingPfLeads(String pfToken, int page) {
+  public static CallTrackingLeadsInfo getCallTrackingPfLeads(String pfToken, int page) {
     String callTrackingLeadsJson = "";
     try {
       HttpResponse<JsonNode> response =
@@ -79,13 +76,12 @@ public class RestApi {
               .asJson();
       callTrackingLeadsJson = response.getBody().toPrettyString();
     } catch (Exception e) {
-      leadsErrorsRepository.save(
-          new LeadsErrors((long) e.hashCode(), e.toString(), TimeUtil.currentTime()));
+      e.printStackTrace();
     }
     return gson.fromJson(callTrackingLeadsJson, CallTrackingLeadsInfo.class);
   }
 
-  public CreatedBitrixLead createBitrixLead(
+  public static CreatedBitrixLead createBitrixLead(
       String firstName, String phone, String email, String title, String comment, int assigneeId) {
     String createdBitrixLeadJson = "";
     try {
@@ -102,8 +98,7 @@ public class RestApi {
               .asJson();
       createdBitrixLeadJson = response.getBody().toPrettyString();
     } catch (Exception e) {
-      leadsErrorsRepository.save(
-          new LeadsErrors((long) e.hashCode(), e.toString(), TimeUtil.currentTime()));
+      e.printStackTrace();
     }
     return gson.fromJson(createdBitrixLeadJson, CreatedBitrixLead.class);
   }
@@ -125,7 +120,7 @@ public class RestApi {
     return leadUpdatingResult;
   }
 
-  public boolean updateBitrixLead(Long bitrixLeadId, int assigneeLeadId) {
+  public static boolean updateBitrixLead(Long bitrixLeadId, int assigneeLeadId) {
     boolean leadUpdatingResult;
     try {
       HttpResponse<JsonNode> response =
@@ -138,14 +133,12 @@ public class RestApi {
               .asJson();
       leadUpdatingResult = response.isSuccess();
     } catch (Exception e) {
-      leadsErrorsRepository.save(
-          new LeadsErrors((long) e.hashCode(), e.toString(), TimeUtil.currentTime()));
       leadUpdatingResult = false;
     }
     return leadUpdatingResult;
   }
 
-  public BitrixLeadsInfo getBitrixLeads(int startFromLead) {
+  public static BitrixLeadsInfo getAllBitrixLeads(int startFromLead) {
     String bitrixLeadsJson = "";
     try {
       HttpResponse<JsonNode> response =
@@ -155,19 +148,17 @@ public class RestApi {
                       startFromLead))
               .header("Cookie", "qmb=0")
               .header("Content-Type", "application/json")
-              .header("start", String.valueOf(startFromLead))
               .connectTimeout(10000)
               .asJson();
       bitrixLeadsJson = response.getBody().toPrettyString();
     } catch (Exception e) {
-      leadsErrorsRepository.save(
-          new LeadsErrors((long) e.hashCode(), e.toString(), TimeUtil.currentTime()));
+      e.printStackTrace();
     }
     return gson.fromJson(bitrixLeadsJson, BitrixLeadsInfo.class);
   }
 
-  public GetBitrixLeadInfo getBitrixLead(Long bitrixLeadId) {
-    String getBitrixLeadInfo = "";
+  public static BitrixLead getBitrixLeadById(Long bitrixLeadId) {
+    String bitrixLead = "";
     try {
       HttpResponse<JsonNode> response =
           Unirest.post("https://eqt.bitrix24.by/rest/53/t2kn6fktlq973hco/crm.lead.get.json")
@@ -176,11 +167,11 @@ public class RestApi {
               .field("ID", bitrixLeadId)
               .connectTimeout(10000)
               .asJson();
-      getBitrixLeadInfo = response.getBody().toPrettyString();
+      bitrixLead = response.getBody().toPrettyString();
     } catch (Exception e) {
-      leadsErrorsRepository.save(
-          new LeadsErrors((long) e.hashCode(), e.toString(), TimeUtil.currentTime()));
+      System.out.println(bitrixLeadId);
+      e.printStackTrace();
     }
-    return gson.fromJson(getBitrixLeadInfo, GetBitrixLeadInfo.class);
+    return gson.fromJson(bitrixLead, BitrixLead.class);
   }
 }

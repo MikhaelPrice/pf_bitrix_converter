@@ -9,11 +9,8 @@ import java.util.List;
 public class BitrixLeadsInfo {
 
   @SerializedName("result")
-  private List<BitrixLeadById> bitrixLeadsByIds;
+  private List<BitrixLead> bitrixLeads;
 
   @SerializedName("total")
-  private int totalBitrixLeads;
-
-  @SerializedName("next")
-  private int nextBitrixLeads;
+  private int total;
 }

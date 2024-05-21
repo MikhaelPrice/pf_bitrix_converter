@@ -19,18 +19,6 @@ public class BitrixLeads {
   @Column(name = "title")
   private String title;
 
-  @Column(name = "phone")
-  private String phone;
-
-  @Column(name = "name")
-  private String name;
-
-  @Column(name = "comment")
-  private String comment;
-
   @Column(name = "updatedOnBitrix")
-  private boolean createdOnBitrix;
-
-  @Column(name = "responsible")
-  private int assignee;
+  private boolean updatedOnBitrix;
 }
