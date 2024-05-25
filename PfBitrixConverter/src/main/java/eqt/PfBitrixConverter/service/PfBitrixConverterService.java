@@ -1,14 +1,8 @@
 package eqt.PfBitrixConverter.service;
 
 import eqt.PfBitrixConverter.dto.*;
-import eqt.PfBitrixConverter.entity.BitrixLeads;
-import eqt.PfBitrixConverter.entity.CallTrackingLeads;
-import eqt.PfBitrixConverter.entity.Leads;
-import eqt.PfBitrixConverter.entity.LeadsErrors;
-import eqt.PfBitrixConverter.repository.BitrixLeadsRepository;
-import eqt.PfBitrixConverter.repository.CallTrackingLeadsRepository;
-import eqt.PfBitrixConverter.repository.LeadsErrorsRepository;
-import eqt.PfBitrixConverter.repository.LeadsRepository;
+import eqt.PfBitrixConverter.entity.*;
+import eqt.PfBitrixConverter.repository.*;
 import eqt.PfBitrixConverter.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,28 +18,67 @@ import static eqt.PfBitrixConverter.util.LeadUtil.*;
 public class PfBitrixConverterService {
 
   private static final String PROPERTY_FINDER_LEADS_TITLE = "Property Finder Lead";
+  private static final String PROPERTY_FINDER_WHATSAPP_TITLE = "Property Finder Whatsapp";
   private static final String PROPERTY_FINDER_CALL_TRACKING_LEADS_TITLE = "Property Finder Call";
 
   @Autowired private LeadsRepository leadsRepository;
   @Autowired private CallTrackingLeadsRepository callTrackingLeadsRepository;
   @Autowired private BitrixLeadsRepository bitrixLeadsRepository;
   @Autowired private LeadsErrorsRepository leadsErrorsRepository;
+  @Autowired private WhatsappLeadsRepository whatsappLeadsRepository;
 
   @Scheduled(fixedRate = 300000)
   public void sendNewLeadsFromPfExpertToBitrix() {
     try {
-      List<BitrixLead> totalBitrixLeads = getBitrixLeadsFromAllPages();
       String pfToken = createPfToken().getToken();
+      List<PfProperty> pfProperties = getAllPfProperties(pfToken);
       List<LeadsInfo> pfLeadsInfoPages = getAllLeadsPages(pfToken);
-      List<CallTrackingLeadsInfo> callTrackingLeadsFromAllPages =
+      List<CallTrackingLeadsInfo> pfCallTrackingLeadsInfoPages =
           getAllCallTrackingLeadsPages(pfToken);
+      List<BitrixLead> totalBitrixLeads = getBitrixLeadsFromAllPages();
+      List<WhatsappLeadsInfo> pfWhatsappInfoPages = getAllWhatsappLeadsPages(pfToken);
+      for (WhatsappLeadsInfo whatsappLeadsPage : pfWhatsappInfoPages) {
+        for (WhatsappLead whatsappLead : whatsappLeadsPage.getWhatsappLeads()) {
+          Long whatsappLeadId = whatsappLead.getId();
+          String whatsappLeadPhone = whatsappLead.getPhone();
+          String whatsappLeadStatus = whatsappLead.getStatus();
+          Long pfAgentId = whatsappLead.getPfAgent().getId();
+          String propertyReference = whatsappLead.getPropertyReference();
+          String whatsappLeadComment = "";
+          for (PfProperty pfProperty : pfProperties) {
+            if (propertyReference.equals(pfProperty.getReference())) {
+              whatsappLeadComment = buildWhatsappLeadComment(pfProperty);
+            }
+          }
+          if (!whatsappLeadsRepository.existsById(whatsappLeadId)) {
+            CreatedBitrixLead bitrixLead =
+                createBitrixLead(
+                    propertyReference,
+                    whatsappLeadPhone,
+                    null,
+                    PROPERTY_FINDER_WHATSAPP_TITLE + " " + whatsappLeadStatus,
+                    whatsappLeadComment,
+                    choosePfLeadAssignee(
+                        whatsappLead.getPfAgent().getId(), leadsRepository.count()));
+            WhatsappLeads newWhatsappLead =
+                new WhatsappLeads(
+                    whatsappLeadId,
+                    whatsappLeadPhone,
+                    whatsappLeadStatus,
+                    String.valueOf(pfAgentId),
+                    whatsappLeadComment,
+                    Objects.nonNull(bitrixLead));
+            whatsappLeadsRepository.save(newWhatsappLead);
+          }
+        }
+      }
       for (LeadsInfo leadsPage : pfLeadsInfoPages) {
         for (Lead lead : leadsPage.getLeads()) {
           Long leadId = lead.getId();
           String leadPhone = lead.getPhone();
           String leadEmail = lead.getEmail();
           String leadFirstName = lead.getFirstName();
-          String leadComment = buildBitrixLeadComment(lead);
+          String leadComment = buildLeadComment(lead);
 
           if (!leadsRepository.existsById(leadId)) {
             CreatedBitrixLead bitrixLead =
@@ -68,7 +101,7 @@ public class PfBitrixConverterService {
           }
         }
       }
-      for (CallTrackingLeadsInfo callTrackingLeadsPage : callTrackingLeadsFromAllPages) {
+      for (CallTrackingLeadsInfo callTrackingLeadsPage : pfCallTrackingLeadsInfoPages) {
         for (CallTracking callTracking : callTrackingLeadsPage.getCallTrackingLeads()) {
           Long callTrackingId = callTracking.getId();
           Long pfAgentId = callTracking.getPfAgent().getId();
@@ -84,7 +117,7 @@ public class PfBitrixConverterService {
           }
 
           if (!callTrackingLeadsRepository.existsById(callTrackingId)) {
-            CreatedBitrixLead createdBitrixLead =
+            CreatedBitrixLead bitrixLead =
                 createBitrixLead(
                     leadFirstName,
                     callTrackingPhone,
@@ -99,7 +132,7 @@ public class PfBitrixConverterService {
                     leadEmail,
                     callTrackingPhone,
                     callTrackingCallTime,
-                    Objects.nonNull(createdBitrixLead));
+                    Objects.nonNull(bitrixLead));
             callTrackingLeadsRepository.save(newCallTrackingLead);
           }
         }
@@ -122,7 +155,7 @@ public class PfBitrixConverterService {
       }
     } catch (Exception e) {
       leadsErrorsRepository.save(
-          new LeadsErrors((long) e.hashCode(), e.toString(), TimeUtil.currentTime()));
+          new LeadsErrors((long) e.hashCode(), Objects.toString(e), TimeUtil.currentTime()));
     }
   }
 }

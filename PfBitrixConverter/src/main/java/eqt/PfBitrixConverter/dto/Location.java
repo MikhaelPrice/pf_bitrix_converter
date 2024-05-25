@@ -10,4 +10,6 @@ public class Location {
 
   @SerializedName("sub_community")
   private String subCommunity;
+
+  private String tower;
 }

@@ -2,17 +2,13 @@ package eqt.PfBitrixConverter.api;
 
 import com.google.gson.Gson;
 import eqt.PfBitrixConverter.dto.*;
-import eqt.PfBitrixConverter.repository.LeadsErrorsRepository;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class RestApi {
 
   private static final Gson gson = new Gson();
-
-  @Autowired private LeadsErrorsRepository leadsErrorsRepository;
 
   public static PfToken createPfToken() {
     String tokenJson = "";
@@ -47,6 +43,38 @@ public class RestApi {
       e.printStackTrace();
     }
     return gson.fromJson(leadsJson, LeadsInfo.class);
+  }
+
+  public static WhatsappLeadsInfo getPfWhatsappLeads(String pfToken, int page) {
+    String whatsappLeadsJson = "";
+    try {
+      HttpResponse<JsonNode> response =
+          Unirest.get(String.format("https://api-v2.mycrm.com/whatsapp-leads?page=%s", page))
+              .header("Content-Type", "application/json")
+              .header("Authorization", String.format("Bearer %s", pfToken))
+              .connectTimeout(10000)
+              .asJson();
+      whatsappLeadsJson = response.getBody().toPrettyString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return gson.fromJson(whatsappLeadsJson, WhatsappLeadsInfo.class);
+  }
+
+  public static PfPropertiesInfo getPfProperties(String pfToken, int page) {
+    String pfPropertiesJson = "";
+    try {
+      HttpResponse<JsonNode> response =
+          Unirest.get(String.format("https://api-v2.mycrm.com/properties?page=%s", page))
+              .header("Content-Type", "application/json")
+              .header("Authorization", String.format("Bearer %s", pfToken))
+              .connectTimeout(10000)
+              .asJson();
+      pfPropertiesJson = response.getBody().toPrettyString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return gson.fromJson(pfPropertiesJson, PfPropertiesInfo.class);
   }
 
   public static Lead getPfLeadById(String pfToken, Long leadId) {

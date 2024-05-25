@@ -1,13 +1,12 @@
 package eqt.PfBitrixConverter.util;
 
-import eqt.PfBitrixConverter.api.RestApi;
 import eqt.PfBitrixConverter.dto.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import static eqt.PfBitrixConverter.api.RestApi.getAllBitrixLeads;
-import static eqt.PfBitrixConverter.api.RestApi.getCallTrackingPfLeads;
+import static eqt.PfBitrixConverter.api.RestApi.*;
 
 public class LeadUtil {
 
@@ -28,13 +27,39 @@ public class LeadUtil {
 
   public static List<LeadsInfo> getAllLeadsPages(String pfToken) {
     List<LeadsInfo> leadsInfoPages = new ArrayList<>();
-    LeadsInfo leadsInfo = RestApi.getPfLeads(pfToken, 1);
+    LeadsInfo leadsInfo = getPfLeads(pfToken, 1);
     leadsInfoPages.add(leadsInfo);
     double pagesMore = (double) leadsInfo.getCount() / 100;
-    for (int pages = 2; pages <= pagesMore; pages++) {
-      leadsInfoPages.add(RestApi.getPfLeads(pfToken, pages));
+    for (int pages = 1; pages <= pagesMore; pages++) {
+      leadsInfoPages.add(getPfLeads(pfToken, pages + 1));
     }
     return leadsInfoPages;
+  }
+
+  public static List<PfProperty> getAllPfProperties(String pfToken) {
+    List<PfPropertiesInfo> pfPropertiesInfoPages = new ArrayList<>();
+    PfPropertiesInfo pfPropertiesInfo = getPfProperties(pfToken, 1);
+    pfPropertiesInfoPages.add(pfPropertiesInfo);
+    double pagesMore = (double) pfPropertiesInfo.getCount() / 100;
+    for (int pages = 1; pages <= pagesMore; pages++) {
+      pfPropertiesInfoPages.add(getPfProperties(pfToken, pages + 1));
+    }
+    List<PfProperty> pfProperties = new ArrayList<>();
+    for (PfPropertiesInfo propertiesInfoPage : pfPropertiesInfoPages) {
+      pfProperties.addAll(propertiesInfoPage.getProperties());
+    }
+    return pfProperties;
+  }
+
+  public static List<WhatsappLeadsInfo> getAllWhatsappLeadsPages(String pfToken) {
+    List<WhatsappLeadsInfo> whatsappLeadsInfoPages = new ArrayList<>();
+    WhatsappLeadsInfo whatsappLeadsInfo = getPfWhatsappLeads(pfToken, 1);
+    whatsappLeadsInfoPages.add(whatsappLeadsInfo);
+    double pagesMore = (double) whatsappLeadsInfo.getCount() / 100;
+    for (int pages = 1; pages <= pagesMore; pages++) {
+      whatsappLeadsInfoPages.add(getPfWhatsappLeads(pfToken, pages + 1));
+    }
+    return whatsappLeadsInfoPages;
   }
 
   public static List<CallTrackingLeadsInfo> getAllCallTrackingLeadsPages(String pfToken) {
@@ -42,8 +67,8 @@ public class LeadUtil {
     CallTrackingLeadsInfo callTrackingLeadsInfo = getCallTrackingPfLeads(pfToken, 1);
     callTrackingLeadsInfoPages.add(callTrackingLeadsInfo);
     double pagesMore = (double) callTrackingLeadsInfo.getCount() / 100;
-    for (int pages = 2; pages <= pagesMore; pages++) {
-      callTrackingLeadsInfoPages.add(getCallTrackingPfLeads(pfToken, pages));
+    for (int pages = 1; pages <= pagesMore; pages++) {
+      callTrackingLeadsInfoPages.add(getCallTrackingPfLeads(pfToken, pages + 1));
     }
     return callTrackingLeadsInfoPages;
   }
@@ -58,7 +83,50 @@ public class LeadUtil {
     return totalBitrixLeads;
   }
 
-  public static String buildBitrixLeadComment(Lead lead) {
+  public static String buildWhatsappLeadComment(PfProperty pfProperty) {
+    double propertySize = pfProperty.getSize();
+    int bedrooms = pfProperty.getBedrooms();
+    int bathrooms = pfProperty.getBathrooms();
+    String city = pfProperty.getLocation().getCity();
+    String community = pfProperty.getLocation().getCommunity();
+    String subCommunity = pfProperty.getLocation().getSubCommunity();
+    String offeringType = pfProperty.getPrice().getOfferingType();
+    List<Price.PriceInfo> priceInfo = pfProperty.getPrice().getPriceInfo();
+    String period;
+    int priceValue;
+    if (Objects.nonNull(priceInfo)) {
+      period = priceInfo.get(0).getPeriod();
+      priceValue = priceInfo.get(0).getValue();
+    } else {
+      period = "not specified";
+      priceValue = pfProperty.getPrice().getValue();
+    }
+    String tower = pfProperty.getLocation().getTower();
+
+    return "Location: "
+        + city
+        + ", "
+        + community
+        + "\nProject: "
+        + subCommunity
+        + ", "
+        + tower
+        + ", "
+        + offeringType
+        + "\nSize: "
+        + propertySize
+        + ", Bedrooms "
+        + bedrooms
+        + ", Bathrooms "
+        + bathrooms
+        + ", period for rent "
+        + period
+        + "\nPrice: "
+        + priceValue
+        + " AED";
+  }
+
+  public static String buildLeadComment(Lead lead) {
     List<Preference> preferences = lead.getPreferences();
     String offeringType = preferences.get(0).getOfferingType();
     String realEstateObject = preferences.get(0).getTypes().get(0).getName();
