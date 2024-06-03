@@ -46,7 +46,9 @@ public class PfBitrixConverterService {
           String propertyReference = whatsappLead.getPropertyReference();
           String whatsappLeadComment = "";
           for (PfProperty pfProperty : pfProperties) {
-            if (propertyReference.equals(pfProperty.getReference())) {
+            if (Objects.isNull(propertyReference)) {
+              break;
+            } else if (propertyReference.equals(pfProperty.getReference())) {
               whatsappLeadComment = buildWhatsappLeadComment(pfProperty);
             }
           }
@@ -145,7 +147,9 @@ public class PfBitrixConverterService {
             bitrixLeadTitle.equals(PROPERTY_FINDER_LEADS_TITLE)
                 || bitrixLeadTitle.equals(PROPERTY_FINDER_CALL_TRACKING_LEADS_TITLE);
         if (responsible == ALEX_BITRIX_ID) {
-          boolean updateBitrixLead = updateBitrixLead(bitrixLeadId, BABENKO_BITRIX_ID);
+          boolean updateBitrixLead =
+              updateBitrixLead(
+                  bitrixLeadId, chooseBitrixLeadAssignee(bitrixLeadsRepository.count()));
           if (!bitrixLeadsRepository.existsById(bitrixLeadId) && !isPfLead) {
             BitrixLeads newBitrixLead =
                 new BitrixLeads(bitrixLeadId, bitrixLeadTitle, updateBitrixLead);
