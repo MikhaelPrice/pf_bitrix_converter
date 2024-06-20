@@ -173,8 +173,10 @@ public class LeadUtil {
   public static int choosePfLeadAssignee(long pfAgentId, long count) {
     if (pfAgentId == DIACHKOVA_PF_ID) {
       return DIACHKOVA_BITRIX_ID;
-    } else if (pfAgentId == BABENKO_PF_ID || pfAgentId == VLAD_PF_ID) {
+    } else if (pfAgentId == BABENKO_PF_ID) {
       return BABENKO_BITRIX_ID;
+    } else if (pfAgentId == VLAD_PF_ID) {
+      return VLAD_BITRIX_ID;
     }
     return chooseBitrixLeadAssignee(count);
   }

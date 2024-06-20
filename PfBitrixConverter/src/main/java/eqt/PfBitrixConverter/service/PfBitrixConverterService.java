@@ -46,9 +46,7 @@ public class PfBitrixConverterService {
           String propertyReference = whatsappLead.getPropertyReference();
           String whatsappLeadComment = "";
           for (PfProperty pfProperty : pfProperties) {
-            if (Objects.isNull(propertyReference)) {
-              break;
-            } else if (propertyReference.equals(pfProperty.getReference())) {
+            if (propertyReference.equals(pfProperty.getReference())) {
               whatsappLeadComment = buildWhatsappLeadComment(pfProperty);
             }
           }
@@ -69,6 +67,7 @@ public class PfBitrixConverterService {
                     whatsappLeadStatus,
                     String.valueOf(pfAgentId),
                     whatsappLeadComment,
+                    propertyReference,
                     Objects.nonNull(bitrixLead));
             whatsappLeadsRepository.save(newWhatsappLead);
           }

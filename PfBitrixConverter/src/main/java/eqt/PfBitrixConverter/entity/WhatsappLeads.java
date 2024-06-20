@@ -28,6 +28,9 @@ public class WhatsappLeads {
   @Column(name = "comment", length = 2000)
   private String comment;
 
+  @Column(name = "propertyReference")
+  private String propertyReference;
+
   @Column(name = "createdOnBitrix")
   private boolean createdOnBitrix;
 }
